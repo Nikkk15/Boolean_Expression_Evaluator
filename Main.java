@@ -59,7 +59,7 @@ public class Main{
         for (String token : tokens) {
             if (isNumber(token)) {
                 int num = Integer.parseInt(token);
-                stack.push(token);
+                stack.push(num);
 
 
         }
@@ -126,33 +126,6 @@ public class Main{
             return false;
         }
 }
-        
-    public static boolean evaluateOperation(ArrayStack<Boolean> boolStack, String operator){
-        if (boolStack.size() < 2) {
-            System.out.println("(Not enough operands)");
-            return false;
-        }
-        if (operator.equals("!")){
-            boolStack.push(!boolStack.pop());
-        }
-        else{
-            boolean op2 = boolStack.pop();
-            boolean op1 = boolStack.pop();
-            if (operator.equals("&&")){
-                boolStack.push(op1 && op2);
-                return true;
-            }
-            else if (operator.equals("||")){
-                boolStack.push(op1 || op2);
-                return true;
-            }
-            else {
-                System.out.println("Illegal operator");
-                return false;
-            }
-        }
-        return false;
-    }
 
 
         //Next steps:
