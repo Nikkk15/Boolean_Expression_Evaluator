@@ -3,12 +3,17 @@ public class Main{
     public static void main(String[] args){
         Scanner input = new Scanner(System.in);
         boolean stop;
+        
+        System.out.println("=== Boolean Expression Evaluator ===\n");
+        System.out.println("Supported operators: <, >, <=, >=, ==, !=, &&, ||, !");
+        System.out.println("Use parentheses and spaces between tokens (e.g., ( 5 > 3 ) && ( 2 != 1 ))\n");
+
         do{         
             System.out.println("Enter a boolean expression to be evaluated: ");
             String exprs = input.nextLine().trim();
             System.out.println(Evaluate(toPostfix(exprs)));
             System.out.println("Would you like to evaluate another boolean expression? (type 'y' to keep going or 'n' to stop): ");
-            char ans = input.nextLine().charAt(0);
+            char ans = input.nextLine().trim().toLowerCase().charAt(0);
             stop = (ans == 'y') ? false : true;
         } while (!stop);                                        //Get expression from user
     }
@@ -34,13 +39,18 @@ public class Main{
                 }
             }
         }
-        if (!opStack.isEmpty()){                                //Add all remaining operators within the operator stack
+                                       //Add all remaining operators within the operator stack
             while (!opStack.isEmpty()){
+                if (opStack.peek().equals("(")) {
+                    throw new IllegalArgumentException("Mismatched parentheses");
+                }
                 postfix += (" "+opStack.pop());
             }
-        }
+            
+        
         return postfix;
     }
+
 
     public static boolean isNumber(String token){               //Check if number or operand
         try {
@@ -55,77 +65,66 @@ public class Main{
     public static boolean Evaluate(String postfix){
         ArrayStack<Integer> stack = new ArrayStack<>();
         ArrayStack<Boolean> boolStack = new ArrayStack<>();
-         String[] tokens = postfix.trim().split("\\s+");
+        String[] tokens = postfix.trim().split("\\s+");
+        boolean expressionOk = true;
         for (String token : tokens) {
             if (isNumber(token)) {
                 int num = Integer.parseInt(token);
                 stack.push(num);
-
-
-        }
-        return true;
-        
-        
-    }
-
-    public static boolean evaluateOperator(ArrayStack<Integer> stack, ArrayStack<Boolean> boolStack, String operator) {
-        if ((stack.size() < 2) || (boolStack.size() < 2)) {
-            System.out.println(" (Not enough operands)");
-        return false;
-        }
-        if (operator.equals("!")){
-            boolStack.push(!boolStack.pop());
-        }
-        else{
-            boolean op2 = boolStack.pop();
-            boolean op1 = boolStack.pop();
-            if (operator.equals("&&")){
-                boolStack.push(op1 && op2);
-                return true;
-            }
-            else if (operator.equals("||")){
-                boolStack.push(op1 || op2);
-                return true;
-            }
+                }
             else {
-                System.out.println("Illegal operator");
+                expressionOk = evaluateOperator(stack, boolStack, token);
+                if (!expressionOk){
+                    break;
+                }
+            }
+        }
+        if (boolStack.isEmpty()) {throw new IllegalArgumentException("Incomplete expression");}
+        return boolStack.pop();
+    }
+    public static boolean evaluateOperator(ArrayStack<Integer> stack, ArrayStack<Boolean> boolStack, String operator) {
+        if (operator.equals("!")) {
+            if (boolStack.size() < 1) {
+                System.out.println("(Not enough operands)");
                 return false;
             }
+            boolStack.push(!boolStack.pop());
+            return true;                    
+        }
+        if (operator.equals("&&") || operator.equals("||")) {
+            if (boolStack.size() < 2) {
+                System.out.println("(Not enough operands)");
+                return false;
+            }
+            boolean op2 = boolStack.pop();
+            boolean op1 = boolStack.pop();
+            if (operator.equals("&&")) {
+                boolStack.push(op1 && op2);
+            } 
+            else {
+                boolStack.push(op1 || op2);
+            }
+            return true;
         }
 
-        int op2 = stack.pop();
-        int op1 = stack.pop();
-        
+        if (stack.size() < 2) {
+        System.out.println("(Not enough operands)");
+        return false;
+    }
+    int op2 = stack.pop();
+    int op1 = stack.pop();
 
-        if (operator.equals("<")) {
-            boolStack.push(op1 < op2);
-            return true;
-        }
-        else if (operator.equals(">")) {
-            boolStack.push(op1 > op2);
-            return true;
-        }
-        else if (operator.equals("<=")) {
-            boolStack.push(op1 <= op2);
-            return true;
-        }
-        else if (operator.equals(">=")) {
-            boolStack.push(op1 >= op2);
-            return true;
-        }
-        else if (operator.equals("==")) {
-            boolStack.push(op1 >= op2);
-            return true;
-        }
-        else if (operator.equals("!=")) {
-            boolStack.push(op1 != op2);
-            return true;
-        }
-        else {
-            System.out.println(" (Illegal operator)");
-            return false;
-        }
+    if (operator.equals("<"))       { boolStack.push(op1 <  op2); return true; }
+    else if (operator.equals(">"))  { boolStack.push(op1 >  op2); return true; }
+    else if (operator.equals("<=")) { boolStack.push(op1 <= op2); return true; }
+    else if (operator.equals(">=")) { boolStack.push(op1 >= op2); return true; }
+    else if (operator.equals("==")) { boolStack.push(op1 == op2); return true; }
+    else if (operator.equals("!=")) { boolStack.push(op1 != op2); return true; }
+
+    System.out.println(" (Illegal operator)");
+    return false;
 }
+  //
 
 
         //Next steps:
@@ -135,5 +134,4 @@ public class Main{
         //- create algorithm to evaluate postfix expression
         //- return true or false
         //2. Check whether input is valid or not
-}
 }
