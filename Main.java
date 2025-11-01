@@ -54,7 +54,7 @@ public class Main{
 
     public static boolean isNumber(String token){               //Check if number or operand
         try {
-            Integer.parseInt(token);
+            Double.parseDouble(token);
             return true;
         } catch (NumberFormatException e) {
             return false;
@@ -63,13 +63,13 @@ public class Main{
     }
 
     public static boolean Evaluate(String postfix){
-        ArrayStack<Integer> stack = new ArrayStack<>();
+        ArrayStack<Double> stack = new ArrayStack<>();
         ArrayStack<Boolean> boolStack = new ArrayStack<>();
         String[] tokens = postfix.trim().split("\\s+");
         boolean expressionOk = true;
         for (String token : tokens) {
             if (isNumber(token)) {
-                int num = Integer.parseInt(token);
+                double num = Double.parseDouble(token);
                 stack.push(num);
                 }
             else {
@@ -82,7 +82,7 @@ public class Main{
         if (boolStack.isEmpty()) {throw new IllegalArgumentException("Incomplete expression");}
         return boolStack.pop();
     }
-    public static boolean evaluateOperator(ArrayStack<Integer> stack, ArrayStack<Boolean> boolStack, String operator) {
+    public static boolean evaluateOperator(ArrayStack<Double> stack, ArrayStack<Boolean> boolStack, String operator) {
         if (operator.equals("!")) {
             if (boolStack.size() < 1) {
                 System.out.println("(Not enough operands)");
@@ -111,8 +111,8 @@ public class Main{
         System.out.println("(Not enough operands)");
         return false;
     }
-    int op2 = stack.pop();
-    int op1 = stack.pop();
+    double op2 = stack.pop();
+    double op1 = stack.pop();
 
     if (operator.equals("<"))       { boolStack.push(op1 <  op2); return true; }
     else if (operator.equals(">"))  { boolStack.push(op1 >  op2); return true; }
